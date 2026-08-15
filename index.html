@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أكاديمية ابن الصقر التعليمية </title>
+    <!-- Favicon / App Icon -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <!-- Google Fonts: Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styleheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Full-Screen Login Modal Overlay (Image 1 Replica) -->
+    <div id="login-modal-overlay" class="login-modal-overlay">
+        <div class="login-card-paper">
+            <div class="login-logo-box">
+                <img src="icon.png" alt="لوجو مستر هيثم فؤاد" class="login-logo">
+            </div>
+            <h2 class="login-title">أكاديمية ابن الصقر التعليمية</h2>
+            <form id="login-form" onsubmit="event.preventDefault();">
+                <div class="login-field-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+                </div>
+                <div class="login-field-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+                </div>
+                <div id="login-error-msg" class="login-error-msg" style="display: none;"></div>
+                <button type="submit" id="btn-login-submit" class="btn-login-submit">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Theme & Decorative Elements -->
+    <div class="glow-bg">
+        <div class="glow-sphere orange"></div>
+        <div class="glow-sphere cyan"></div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Header -->
+        <header class="main-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <img src="icon.png" alt="لوجو أكاديمية ابن الصقر" class="logo-img">
+                </div>
+                <div class="title-text-box">
+                    <h1 class="academy-main-title"><i class="fa-solid fa-graduation-cap title-icon"></i> أكاديمية ابن
+                        الصقر التعليمية</h1>
+                    <span class="academy-sub-badge"><i class="fa-solid fa-award"></i> تحت إشراف مستر هيثم فؤاد</span>
+                </div>
+            </div>
+
+            <div class="header-actions-wrapper">
+                <div class="dashboard-tabs">
+                    <button type="button" class="tab-btn active" id="tab-students">
+                        <i class="fa-solid fa-graduation-cap"></i> إدارة الطلاب
+                    </button>
+                    <button type="button" class="tab-btn" id="tab-teachers">
+                        <i class="fa-solid fa-chart-pie"></i> لوحة التحكم
+                    </button>
+                    <button type="button" id="btn-open-wa-settings" class="btn-wa-settings-top" title="إعدادات الربط التلقائي بالواتساب">
+                        <i class="fa-brands fa-whatsapp"></i> ربط الواتساب
+                    </button>
+                    <button type="button" id="btn-logout" class="btn-logout-header" title="تسجيل الخروج">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> خروج
+                    </button>
+                </div>
+                <!-- Firebase Status Tag -->
+                <div class="connection-status">
+                    <span id="status-dot" class="status-dot offline"></span>
+                    <span id="status-text">جاري الاتصال بقاعدة البيانات...</span>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- Main Dashboard Content Grid -->
+        <main class="dashboard-grid">
+
+            <!-- Column 1: Left Container (Form Card + Developer Credits Card) -->
+            <div class="dashboard-left-col">
+                <section class="card form-card" id="student-form-section">
+                    <div class="card-header form-card-header-flex">
+                        <h2><i class="fa-solid fa-user-plus"></i> إضافة وتعديل بيانات طالب</h2>
+                        <button type="button" id="btn-export-excel" class="btn-excel-export"
+                            title="تصدير جميع البيانات لملف إكسيل Excel">
+                            <i class="fa-solid fa-file-excel"></i> Export Excel
+                        </button>
+                    </div>
+
+                    <form id="student-form" class="student-form" onsubmit="event.preventDefault();">
+                        <!-- Academic ID (Linked with QR Scan) -->
+                        <div class="form-group qr-linked form-group-centered">
+                            <label for="academic-id">
+                                <span class="label-text"><i class="fa-solid fa-id-card"></i> الرقم الأكاديمي</span>
+                                <span class="qr-pulse-tag" id="qr-active-tag">
+                                    <span class="pulse-dot"></span> متصل بالماسح
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="academic-id" required autocomplete="off">
+                                <button type="button" class="btn-input-action" id="btn-manual-search"
+                                    title="ابحث عن هذا الرقم">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-row-grid">
+                            <!-- Name -->
+                            <div class="form-group">
+                                <label for="student-name"><i class="fa-solid fa-user"></i> اسم الطالب</label>
+                                <input type="text" id="student-name" required>
+                            </div>
+
+                            <!-- Student Grade -->
+                            <div class="form-group">
+                                <label for="student-grade"><i class="fa-solid fa-school"></i> الصف الدراسي</label>
+                                <div class="custom-select-wrapper">
+                                    <select id="student-grade" required data-default-value="">
+                                        <option value="" disabled selected>اختر الصف الدراسي...</option>
+                                        <option value="الصف الأول الإعدادي">الصف الأول الإعدادي</option>
+                                        <option value="الصف الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                                        <option value="الصف الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                                    </select>
+                                    <div class="select-icon-box" title="إلغاء الاختيار">
+                                        <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                        <i class="fa-solid fa-xmark icon-clear"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row-grid">
+                            <!-- Student Phone -->
+                            <div class="form-group">
+                                <label for="student-phone"><i class="fa-solid fa-phone"></i> رقم هاتف الطالب</label>
+                                <input type="text" id="student-phone" required maxlength="11" inputmode="numeric"
+                                    placeholder="01xxxxxxxxx">
+                            </div>
+
+                            <!-- Guardian Phone -->
+                            <div class="form-group">
+                                <label for="guardian-phone"><i class="fa-solid fa-mobile-screen-button"></i> رقم هاتف ولي
+                                    الأمر</label>
+                                <input type="text" id="guardian-phone" required maxlength="11" inputmode="numeric"
+                                    placeholder="01xxxxxxxxx">
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group">
+                            <label for="student-notes"><i class="fa-solid fa-comment-dots"></i> ملاحظات</label>
+                            <input type="text" id="student-notes">
+                        </div>
+
+                        <!-- Buttons Actions Panel -->
+                        <div class="form-actions">
+                            <button type="submit" id="btn-save" class="btn btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i> حفظ / إضافة
+                            </button>
+                            <div class="form-sub-actions">
+                                <button type="button" id="btn-edit" class="btn btn-warning" disabled>
+                                    <i class="fa-solid fa-pen-to-square"></i> تعديل
+                                </button>
+                                <button type="button" id="btn-clear" class="btn btn-secondary">
+                                    <i class="fa-solid fa-eraser"></i> مسح
+                                </button>
+                                <button type="button" id="btn-delete" class="btn btn-danger" disabled>
+                                    <i class="fa-solid fa-trash-can"></i> حذف
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Developer Social Credits Standalone Card -->
+                <div class="footer-icons">
+                    <span class="footer-credit">By Eng Ahmed Mohamed</span>
+                    <div class="icons-row">
+                        <a href="https://web.facebook.com/ahmed.mohamed.857575" target="_blank" title="Facebook"
+                            class="social-icon facebook"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="https://wa.me/201159768514" target="_blank" title="WhatsApp"
+                            class="social-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/in/ahmed-mohamed-596713279/" target="_blank" title="LinkedIn"
+                            class="social-icon linkedin"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="https://www.instagram.com/ahmed_mohamed_40/?__pwa=1" target="_blank" title="Instagram"
+                            class="social-icon instagram"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: Search & Student Directory -->
+            <section class="card list-card" id="student-list-section">
+                <div class="card-header list-header-flex">
+                    <!-- Search & Filter Controls -->
+                    <div class="table-filter-controls">
+                        <!-- Search Input (Far Right) -->
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="search-input" placeholder="بحث باسم الطالب أو الرقم الأكاديمي...">
+                        </div>
+
+                        <!-- Month Filter -->
+                        <div class="custom-select-wrapper filter-select-wrapper">
+                            <select id="filter-month-select" class="filter-select month-select-top"
+                                title="اختر الشهر المالي">
+                                <option value="2026-01">شهر 1</option>
+                                <option value="2026-02">شهر 2</option>
+                                <option value="2026-03">شهر 3</option>
+                                <option value="2026-04">شهر 4</option>
+                                <option value="2026-05">شهر 5</option>
+                                <option value="2026-06">شهر 6</option>
+                                <option value="2026-07">شهر 7</option>
+                                <option value="2026-08">شهر 8</option>
+                                <option value="2026-09">شهر 9</option>
+                                <option value="2026-10">شهر 10</option>
+                                <option value="2026-11">شهر 11</option>
+                                <option value="2026-12">شهر 12</option>
+                            </select>
+                            <div class="select-icon-box" title="إلغاء الاختيار">
+                                <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                <i class="fa-solid fa-xmark icon-clear"></i>
+                            </div>
+                        </div>
+
+                        <!-- Active Session Selector -->
+                        <div class="custom-select-wrapper filter-select-wrapper">
+                            <select id="active-session-select" class="filter-select session-select-top"
+                                title="رقم الحصة الحالية" data-default-value="1">
+                                <option value="1">الحصة 1</option>
+                                <option value="2">الحصة 2</option>
+                                <option value="3">الحصة 3</option>
+                                <option value="4">الحصة 4</option>
+                                <option value="5">الحصة 5</option>
+                                <option value="6">الحصة 6</option>
+                                <option value="7">الحصة 7</option>
+                                <option value="8">الحصة 8</option>
+                            </select>
+                            <div class="select-icon-box" title="إلغاء الاختيار">
+                                <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                <i class="fa-solid fa-xmark icon-clear"></i>
+                            </div>
+                        </div>
+
+                        <!-- Session Attendance Filter -->
+                        <div class="custom-select-wrapper filter-select-wrapper">
+                            <select id="filter-attendance-select" class="filter-select attendance-select-top"
+                                title="تصفية حسب حالة الحضور بالحصة الحالية" data-default-value="">
+                                <option value="">الحضور</option>
+                                <option value="attended">تم الحضور</option>
+                                <option value="unattended">لم يتم الحضور</option>
+                            </select>
+                            <div class="select-icon-box" title="إلغاء الاختيار">
+                                <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                <i class="fa-solid fa-xmark icon-clear"></i>
+                            </div>
+                        </div>
+
+                        <!-- Grade Filter -->
+                        <div class="custom-select-wrapper filter-select-wrapper">
+                            <select id="filter-grade-select" class="filter-select grade-select-top"
+                                data-default-value="">
+                                <option value="">الصفوف</option>
+                                <option value="الصف الأول الإعدادي">الأول الإعدادي</option>
+                                <option value="الصف الثاني الإعدادي">الثاني الإعدادي</option>
+                                <option value="الصف الثالث الإعدادي">الثالث الإعدادي</option>
+                            </select>
+                            <div class="select-icon-box" title="إلغاء الاختيار">
+                                <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                <i class="fa-solid fa-xmark icon-clear"></i>
+                            </div>
+                        </div>
+
+                        <!-- Payment Fee Status Filter -->
+                        <div class="custom-select-wrapper filter-select-wrapper">
+                            <select id="filter-fee-select" class="filter-select fee-select-top"
+                                title="تصفية حسب حالة المصروفات" data-default-value="">
+                                <option value="">المصروفات</option>
+                                <option value="paid">تم الدفع</option>
+                                <option value="unpaid">لم يتم الدفع</option>
+                            </select>
+                            <div class="select-icon-box" title="إلغاء الاختيار">
+                                <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                <i class="fa-solid fa-xmark icon-clear"></i>
+                            </div>
+                        </div>
+
+                        <!-- Bulk WhatsApp Absent Notice Button (Last in row) -->
+                        <button type="button" id="btn-whatsapp-unattended-bulk" class="btn-whatsapp-top-filter"
+                            title="إرسال رسائل غياب واتساب للطلاب في هذه الحصة">
+                            <i class="fa-brands fa-whatsapp"></i> إرسال (<span id="unattended-count-badge"
+                                class="english-num" dir="ltr">0</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="table-container">
+                    <table class="students-table" id="students-table">
+                        <thead>
+                            <tr>
+                                <th class="col-id">الرقم</th>
+                                <th class="col-name">اسم الطالب</th>
+                                <th class="col-grade">الصف الدراسي</th>
+                                <th class="col-actions">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-list-body">
+                            <!-- Dynamically filled by JS -->
+                            <tr class="table-loading-row">
+                                <td colspan="4">
+                                    <div class="spinner-container">
+                                        <div class="spinner"></div>
+                                        <span>جاري تحميل قائمة الطلاب...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Footer Info -->
+                <div class="table-footer">
+                    <span>إجمالي الطلاب: <strong id="student-count">0</strong> طالب</span>
+                </div>
+            </section>
+
+            <!-- Dashboard Analytics Main Section -->
+            <section class="card dashboard-analytics-card hidden" id="dashboard-analytics-section">
+                <!-- Dashboard Filters & Controls Header -->
+                <div class="dashboard-analytics-header">
+                    <div class="dashboard-title-box">
+                        <h2><i class="fa-solid fa-chart-line"></i> لوحة التحليلات والإحصائيات الشاملة</h2>
+                        <p class="dashboard-subtitle">متابعة لحظية لأداء الطلاب، الحضور والغياب، ونسب تحصيل المصروفات
+                        </p>
+                    </div>
+
+                    <div class="dashboard-filter-bar">
+                        <!-- Grade Filter -->
+                        <div class="form-group margin-bottom-none">
+                            <label for="dash-filter-grade"><i class="fa-solid fa-school"></i> المرحلة / الصف
+                                الدراسي:</label>
+                            <div class="custom-select-wrapper">
+                                <select id="dash-filter-grade" class="dash-select">
+                                    <option value="">جميع الصفوف الدراسية</option>
+                                    <option value="الصف الأول الإعدادي">الصف الأول الإعدادي</option>
+                                    <option value="الصف الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                                    <option value="الصف الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                                </select>
+                                <div class="select-icon-box" title="إلغاء الاختيار">
+                                    <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                    <i class="fa-solid fa-xmark icon-clear"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Month Filter -->
+                        <div class="form-group margin-bottom-none">
+                            <label for="dash-filter-month"><i class="fa-solid fa-calendar-days"></i> الشهر
+                                المالي:</label>
+                            <div class="custom-select-wrapper">
+                                <select id="dash-filter-month" class="dash-select">
+                                    <option value="2026-01">شهر 1</option>
+                                    <option value="2026-02">شهر 2</option>
+                                    <option value="2026-03">شهر 3</option>
+                                    <option value="2026-04">شهر 4</option>
+                                    <option value="2026-05">شهر 5</option>
+                                    <option value="2026-06">شهر 6</option>
+                                    <option value="2026-07">شهر 7</option>
+                                    <option value="2026-08">شهر 8</option>
+                                    <option value="2026-09">شهر 9</option>
+                                    <option value="2026-10">شهر 10</option>
+                                    <option value="2026-11">شهر 11</option>
+                                    <option value="2026-12">شهر 12</option>
+                                </select>
+                                <div class="select-icon-box" title="إلغاء الاختيار">
+                                    <i class="fa-solid fa-chevron-down icon-arrow"></i>
+                                    <i class="fa-solid fa-xmark icon-clear"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="kpi-grid">
+                    <!-- Total Students Card -->
+                    <div class="kpi-card cyan">
+                        <div class="kpi-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">إجمالي الطلاب المسجلين</span>
+                            <span class="kpi-value" id="kpi-total-students">0</span>
+                            <span class="kpi-subtext" id="kpi-grade-subtext">كافة الصفوف الدراسية</span>
+                        </div>
+                    </div>
+
+                    <!-- Attended Today / Active Session Card -->
+                    <div class="kpi-card green">
+                        <div class="kpi-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">الطلاب الحاضرين اليوم</span>
+                            <span class="kpi-value" id="kpi-attended-today">0</span>
+                            <span class="kpi-subtext" id="kpi-attended-rate">0% من إجمالي الطلاب</span>
+                        </div>
+                    </div>
+
+                    <!-- Paid Fees Students Count Today Card -->
+                    <div class="kpi-card purple">
+                        <div class="kpi-icon"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">الطلاب الذين دفعوا المصروفات اليوم</span>
+                            <span class="kpi-value" id="kpi-paid-students">0</span>
+                            <span class="kpi-subtext" id="kpi-paid-students-rate">0% من إجمالي الطلاب</span>
+                        </div>
+                    </div>
+
+                    <!-- Fee Collection Status Card -->
+                    <div class="kpi-card orange">
+                        <div class="kpi-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">نسبة سداد المصروفات</span>
+                            <span class="kpi-value" id="kpi-paid-rate">0%</span>
+                            <span class="kpi-subtext" id="kpi-paid-count-text">0 تم الدفع / 0 لم يدفع</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section Grid -->
+                <div class="charts-grid">
+                    <!-- Attendance Graph (Bar / Line) -->
+                    <div class="chart-card wide">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-chart-simple"></i> رسم بياني: حضور الطلاب اليوم وتوزيع الحصص (1 -
+                                8)</h3>
+                            <span class="badge-pill" id="attendance-chart-badge">متابعة الحضور</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Fee Payment Doughnut Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-chart-pie"></i> توزيع تحصيل المصروفات</h3>
+                        </div>
+                        <div class="chart-container doughnut">
+                            <canvas id="feesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top 5 Students Card -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> أعلى 5 طلاب في متوسط الدرجات
+                            </h3>
+                            <span class="badge-pill"
+                                style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">الطلاب
+                                المتفوقون</span>
+                        </div>
+                        <div class="top-students-list" id="top-students-list">
+                            <!-- Dynamic items populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Exam Grades Performance Bar Chart -->
+                    <div class="chart-card wide">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-square-poll-vertical"></i> متوسط درجات الطلاب في اختبارات الحصص
+                            </h3>
+                            <span class="badge-pill">التقييم الأكاديمي</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="gradesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+        </main>
+    </div>
+
+    <!-- WhatsApp Automatic Integration Settings Modal -->
+    <div id="wa-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-brands fa-whatsapp"></i> إعدادات الربط التلقائي بالواتساب (بدون فتح نوافذ)</h3>
+                <button type="button" id="btn-close-wa-modal" class="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">اختر طريقة الربط المناسبة بك للإرسال الخفي التلقائي في الخلفية دون فتح متصفح
+                    الواتساب:</p>
+
+                <!-- Provider Selector -->
+                <div class="form-group margin-bottom-sm">
+                    <label><i class="fa-solid fa-sliders"></i> اختر طريقة الإرسال المفضلة:</label>
+                    <div class="provider-selector-grid">
+                        <label class="provider-card active" id="card-provider-local">
+                            <input type="radio" name="wa-provider" id="radio-provider-local" value="local" checked>
+                            <div class="provider-info">
+                                <strong><i class="fa-solid fa-desktop" style="color:#10b981"></i> السيرفر
+                                    المحلي</strong>
+                                <span>مجاني 100% على جهازك</span>
+                            </div>
+                        </label>
+                        <label class="provider-card" id="card-provider-ultramsg">
+                            <input type="radio" name="wa-provider" id="radio-provider-ultramsg" value="ultramsg">
+                            <div class="provider-info">
+                                <strong><i class="fa-brands fa-whatsapp" style="color:#25d366"></i> UltraMsg</strong>
+                                <span>حساب UltraMsg</span>
+                            </div>
+                        </label>
+                        <label class="provider-card" id="card-provider-whatsauto">
+                            <input type="radio" name="wa-provider" id="radio-provider-whatsauto" value="whatsauto">
+                            <div class="provider-info">
+                                <strong><i class="fa-solid fa-mobile-screen-button" style="color:#a855f7"></i>
+                                    WhatsAuto</strong>
+                                <span>تطبيق الأندرويد</span>
+                            </div>
+                        </label>
+                        <label class="provider-card" id="card-provider-callmebot">
+                            <input type="radio" name="wa-provider" id="radio-provider-callmebot" value="callmebot">
+                            <div class="provider-info">
+                                <strong><i class="fa-solid fa-robot" style="color:#60a5fa"></i> CallMeBot</strong>
+                                <span>البوت المجاني</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group margin-bottom-sm">
+                    <label for="wa-api-url"><i class="fa-solid fa-link"></i> رابط بوابة إرسال الواتساب (Gateway API
+                        URL)</label>
+                    <input type="text" id="wa-api-url"
+                        placeholder="مثال: https://api.ultramsg.com/instance188259/messages/chat">
+                </div>
+
+                <div class="form-group margin-bottom-sm">
+                    <label for="wa-instance-id"><i class="fa-solid fa-key"></i> رقم الجلسة / Instance ID (خاص بـ
+                        UltraMsg)</label>
+                    <input type="text" id="wa-instance-id" placeholder="مثال: instance188259">
+                </div>
+
+                <div class="form-group margin-bottom-sm">
+                    <label for="wa-token"><i class="fa-solid fa-lock"></i> كود الأمان / API Token</label>
+                    <input type="text" id="wa-token" placeholder="مثال: 0o0d69ndrg6kjver">
+                </div>
+
+                <div class="modal-info-box">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>تنويه: يمكنك التبديل بين UltraMsg و CallMeBot في أي وقت بنقرة واحدة، وفي حال ترك الرابط فارغاً
+                        يتم الاعتماد على الفتح المباشر كخيار احتياطي.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-preset-callmebot" class="btn btn-secondary"
+                    title="تعبئة رابط CallMeBot المجاني تلقائياً"><i class="fa-solid fa-bolt"></i> تعبئة CallMeBot
+                    المجاني</button>
+                <button type="button" id="btn-save-wa-config" class="btn btn-primary"><i
+                        class="fa-solid fa-floppy-disk"></i> حفظ وإعادة التفعيل</button>
+                <button type="button" id="btn-test-wa-config" class="btn btn-secondary"><i
+                        class="fa-solid fa-paper-plane"></i> تجربة الربط</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Custom Bulk Message Selector Modal -->
+    <div id="wa-bulk-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-card wa-bulk-modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-brands fa-whatsapp"></i> إرسال رسائل واتساب لأولياء الأمور</h3>
+                <button type="button" id="btn-close-wa-bulk-modal" class="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 4 Message Option Cards Grid -->
+                <div class="msg-templates-grid">
+                    <!-- Option 1: Attendance -->
+                    <label class="msg-template-card" id="card-msg-attendance">
+                        <input type="radio" name="wa-msg-template" value="attendance">
+                        <div class="msg-card-content">
+                            <div class="msg-card-header">
+                                <i class="fa-solid fa-user-check icon-green"></i>
+                                <strong>حضور الدرس اليوم</strong>
+                            </div>
+                            <p class="msg-preview-text">تم بحمد الله حضور الطالب/ـة: [اسم الطالب] درس اللغة العربية
+                                اليوم...</p>
+                        </div>
+                    </label>
+
+                    <!-- Option 2: Absence -->
+                    <label class="msg-template-card" id="card-msg-absent">
+                        <input type="radio" name="wa-msg-template" value="absent">
+                        <div class="msg-card-content">
+                            <div class="msg-card-header">
+                                <i class="fa-solid fa-user-xmark icon-red"></i>
+                                <strong>عدم حضور الدرس</strong>
+                            </div>
+                            <p class="msg-preview-text">نحيطكم علماً لم يتم حضور الطالب/ـة: [اسم الطالب] درس اللغة
+                                العربية اليوم...</p>
+                        </div>
+                    </label>
+
+                    <!-- Option 3: Paid Fees -->
+                    <label class="msg-template-card" id="card-msg-paid">
+                        <input type="radio" name="wa-msg-template" value="paid">
+                        <div class="msg-card-content">
+                            <div class="msg-card-header">
+                                <i class="fa-solid fa-receipt icon-purple"></i>
+                                <strong>دفع المصروفات</strong>
+                            </div>
+                            <p class="msg-preview-text">تم بحمد الله سداد مصروفات درس اللغة العربية للطالب/ـة: [اسم
+                                الطالب] بنجاح...</p>
+                        </div>
+                    </label>
+
+                    <!-- Option 4: Unpaid Fees -->
+                    <label class="msg-template-card" id="card-msg-unpaid">
+                        <input type="radio" name="wa-msg-template" value="unpaid">
+                        <div class="msg-card-content">
+                            <div class="msg-card-header">
+                                <i class="fa-solid fa-hand-holding-dollar icon-orange"></i>
+                                <strong>عدم دفع المصروفات</strong>
+                            </div>
+                            <p class="msg-preview-text">تنبيه: يرجى العلم أنه لم يتم سداد مصروفات درس اللغة العربية حتى
+                                الآن...</p>
+                        </div>
+                    </label>
+
+                    <!-- Option 5: Student Performance Report -->
+                    <label class="msg-template-card" id="card-msg-report">
+                        <input type="radio" name="wa-msg-template" value="report">
+                        <div class="msg-card-content">
+                            <div class="msg-card-header">
+                                <i class="fa-solid fa-square-poll-vertical icon-blue"></i>
+                                <strong>تقرير أداء الطالب (شامل)</strong>
+                            </div>
+                            <p class="msg-preview-text">تقرير تفصيلي شامل بكشف الحضور والغياب ونتائج الاختبارات
+                                والمصروفات...</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Textarea Message Preview -->
+                <!-- <div class="form-group margin-top-md">
+                    <label for="wa-bulk-msg-preview"><i class="fa-solid fa-eye"></i> معاينة نص الرسالة التي سيتم إرسالها:</label>
+                    <textarea id="wa-bulk-msg-preview" class="msg-preview-textarea" rows="4"></textarea>
+                </div> -->
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btn-confirm-wa-bulk-send" class="btn btn-primary">
+                    <i class="fa-solid fa-paper-plane"></i> إرسال الرسالة الآن (<span id="wa-bulk-send-count"
+                        class="english-num" dir="ltr">0</span>
+                    طالب)
+                </button>
+                <button type="button" id="btn-cancel-wa-bulk-send" class="btn btn-secondary">
+                    <i class="fa-solid fa-xmark"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal (Replacing native confirm dialogs) -->
+    <div id="confirm-modal-overlay" class="custom-modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="custom-modal-card">
+            <button type="button" id="confirm-modal-close" class="custom-modal-close-btn"
+                aria-label="إغلاق">&times;</button>
+            <div class="custom-modal-header">
+                <div class="custom-modal-icon-box danger" id="confirm-modal-icon-box">
+                    <i class="fa-solid fa-triangle-exclamation" id="confirm-modal-icon"></i>
+                </div>
+                <h3 id="confirm-modal-title" class="custom-modal-title">تأكيد الإجراء</h3>
+            </div>
+            <div class="custom-modal-body">
+                <p id="confirm-modal-message" class="custom-modal-message"></p>
+            </div>
+            <div class="custom-modal-footer">
+                <button type="button" id="confirm-modal-btn-confirm" class="custom-btn btn-modal-confirm danger">
+                    <i class="fa-solid fa-check"></i> <span id="confirm-modal-btn-confirm-text">تأكيد</span>
+                </button>
+                <button type="button" id="confirm-modal-btn-cancel" class="custom-btn btn-modal-cancel">
+                    <i class="fa-solid fa-xmark"></i> <span>إلغاء</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Offscreen Student Performance Report Card (Rendered to PNG Image) -->
+    <div id="report-card-offscreen-container"
+        style="position: absolute; left: -9999px; top: 0; width: 680px; pointer-events: none;">
+        <div id="student-report-card" class="report-card-paper">
+            <div class="report-header">
+                <div class="report-logo-box">
+                    <i class="fa-solid fa-graduation-cap report-logo-icon"></i>
+                </div>
+                <h3 class="report-subtitle">أكاديمية ابن الصقر التعليمية</h3>
+                <h2 class="report-main-title">تقرير أداء الطالب</h2>
+                <div class="report-divider"></div>
+            </div>
+
+            <div class="report-profile-box">
+                <h1 id="report-student-name" class="report-student-name">اسم الطالب</h1>
+                <div class="report-student-name-divider"></div>
+                <div class="report-info-grid">
+                    <div class="report-info-col">
+                        <p><strong>كود الطالب:</strong> <span id="report-student-id" class="english-num">---</span></p>
+                        <p><strong>المرحلة:</strong> <span id="report-student-grade">---</span></p>
+                        <p><strong>رقم الهاتف:</strong> <span id="report-student-phone" class="english-num">---</span>
+                        </p>
+                    </div>
+                    <div class="report-info-col">
+                        <p><strong>التاريخ:</strong> <span id="report-date" class="english-num">---</span></p>
+                        <p><strong>الشهر:</strong> <span id="report-month-subject">--- في مادة اللغة العربية</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-section-title">
+                <span class="report-title-bar"></span>
+                <h3>سجل الدرجات والنشاط</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الحضور</th>
+                        <th>درجة الامتحان</th>
+                    </tr>
+                </thead>
+                <tbody id="report-table-body">
+                    <!-- Session rows 1 to 8 -->
+                </tbody>
+            </table>
+
+            <div class="report-summary-grid">
+                <div class="report-summary-box">
+                    <span class="report-summary-bar green"></span>
+                    <p><strong>سجل الحضور:</strong> إجمالي أيام الحضور هذا الشهر: <span id="report-attended-count"
+                            class="english-num">0</span> أيام</p>
+                </div>
+                <div class="report-summary-box">
+                    <span id="report-summary-bar-financial" class="report-summary-bar orange"></span>
+                    <p id="report-financial-status"><strong>السجل المالي:</strong> ---</p>
+                </div>
+            </div>
+
+            <div class="report-footer">
+                <p class="report-thank-you">شكراً لاهتمامكم بمتابعة أداء الطالب.</p>
+                <div class="report-footer-sub">
+                    <p>أكاديمية ابن الصقر التعليمية - تحت إشراف مستر هيثم فؤاد</p>
+                    <p class="report-engineer-credits">تنفيذ المهندس/ أحمد محمد <span
+                            class="english-num">01159768514</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Imports via CDN (v10 Compat) to support running from local file:// protocol -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <!-- Chart.js CDN for Analytics Dashboard Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas CDN for Report Card Image Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- SheetJS CDN for Exporting Excel Data -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

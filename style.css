@@ -3631,6 +3631,31 @@ input:checked + .slider:before {
     box-shadow: 0 8px 24px rgba(79, 70, 229, 0.55);
 }
 
+.btn-wa-settings-top {
+    background: linear-gradient(135deg, rgba(37, 211, 102, 0.15), rgba(16, 185, 129, 0.25));
+    border: 1px solid rgba(37, 211, 102, 0.45);
+    color: #25d366;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-family);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition-smooth);
+    box-shadow: 0 0 10px rgba(37, 211, 102, 0.15);
+}
+
+.btn-wa-settings-top:hover {
+    background: linear-gradient(135deg, #25d366, #10b981);
+    color: #ffffff;
+    border-color: #25d366;
+    box-shadow: 0 0 16px rgba(37, 211, 102, 0.45);
+    transform: translateY(-1px);
+}
+
 .btn-logout-header {
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid rgba(239, 68, 68, 0.35);
@@ -3652,5 +3677,6 @@ input:checked + .slider:before {
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
+
 
 
